@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .node-version
       # No lockfile is committed yet; run `npm install` locally and commit package-lock.json, then switch to `npm ci`.
       - run: npm install
       - run: npm ls --depth=0
@@ -23,3 +23,5 @@ jobs:
       - run: npm test
       - name: Bundle (wrangler dry run, no deploy, no secrets needed)
         run: npm run build
+      - name: Smoke test /mcp with wrangler dev
+        run: npm run smoke

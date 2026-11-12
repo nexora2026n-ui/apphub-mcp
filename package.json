@@ -11,7 +11,8 @@
     "typecheck": "wrangler types && tsc --noEmit",
     "test": "tsx --test test/*.test.ts",
     "check": "npm run typecheck && npm test",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "smoke": "bash scripts/smoke.sh"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.2",

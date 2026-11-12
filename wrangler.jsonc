@@ -4,6 +4,9 @@
   "main": "src/index.ts",
   "compatibility_date": "2025-10-01",
   "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  // Keep variables added in the Cloudflare dashboard when deploying from Git.
+  "keep_vars": true,
   "observability": { "enabled": true },
   "vars": {
     // Optional, non-secret: comma-separated App Store Connect app IDs this server may access.
