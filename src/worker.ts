@@ -6,7 +6,7 @@
  *  - an OAuth access token issued by this Worker (Claude custom connectors).
  */
 import { extractBearer, isAuthorized } from "./auth";
-import { missingSecrets, parseList, type Env } from "./env";
+import { missingSecrets, normalizeEnv, parseList, type Env } from "./env";
 import * as oauth from "./oauth";
 
 export type McpFetchHandler = (request: Request, env: Env, ctx: ExecutionContext) => Promise<Response>;
@@ -33,7 +33,8 @@ function getSigner(env: Env): oauth.OAuthSigner {
 
 export function createWorker(mcpHandler: McpFetchHandler, signerFactory: (env: Env) => oauth.OAuthSigner = getSigner) {
   return {
-    async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    async fetch(request: Request, rawEnv: Env, ctx: ExecutionContext): Promise<Response> {
+      const env = normalizeEnv(rawEnv);
       const url = new URL(request.url);
       const path = url.pathname.replace(/\/+$/, "") || "/";
 

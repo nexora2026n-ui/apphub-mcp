@@ -65,6 +65,7 @@ npx wrangler secret put ASC_PRIVATE_KEY < ~/Downloads/AuthKey_XXXXXXXXXX.p8
 openssl rand -base64 48 | tr -d '\n' | npx wrangler secret put MCP_BEARER_TOKEN
 ```
 
+- Apple の 3 つは `APPLE_ISSUER_ID` / `APPLE_KEY_ID` / `APPLE_PRIVATE_KEY` という名前でも認識します（`ASC_…` が優先）。
 - `MCP_BEARER_TOKEN` はカンマ区切りで複数指定でき、ローテーション時に新旧を並行運用できます。
 - 秘密鍵は `-----BEGIN PRIVATE KEY-----` 形式（PKCS#8）の .p8 をそのまま使います。`\n` でエスケープした 1 行形式も受け付けます。
 

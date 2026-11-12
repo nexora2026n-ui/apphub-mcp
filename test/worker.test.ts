@@ -70,3 +70,27 @@ test("reports missing Apple secrets only to authorised callers", async () => {
 test("unknown paths return 404", async () => {
   assert.equal((await worker.fetch(req("/admin", "secret-token"), env, ctx)).status, 404);
 });
+
+test("accepts APPLE_* names for the Apple credentials", async () => {
+  const appleNamed = {
+    APPLE_ISSUER_ID: "issuer",
+    APPLE_KEY_ID: "key",
+    APPLE_PRIVATE_KEY: "pem",
+    ASC_ALLOWED_APP_IDS: "",
+    MCP_BEARER_TOKEN: "secret-token",
+  } as unknown as Env;
+  let seen: Env | undefined;
+  const w = createWorker(async (_r, e) => {
+    seen = e;
+    return new Response("ok");
+  });
+  const res = await w.fetch(req("/mcp", "secret-token"), appleNamed, ctx);
+  assert.equal(res.status, 200);
+  assert.equal(seen?.ASC_ISSUER_ID, "issuer");
+  assert.equal(seen?.ASC_KEY_ID, "key");
+  assert.equal(seen?.ASC_PRIVATE_KEY, "pem");
+  // ASC_* wins when both are set
+  const both = { ...appleNamed, ASC_KEY_ID: "asc-key" } as Env;
+  await w.fetch(req("/mcp", "secret-token"), both, ctx);
+  assert.equal(seen?.ASC_KEY_ID, "asc-key");
+});

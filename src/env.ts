@@ -12,6 +12,31 @@ export interface Env {
   ASC_ALLOWED_APP_IDS?: string;
 }
 
+/** Alternative names accepted for the Apple credentials (e.g. APPLE_ISSUER_ID set in the dashboard). */
+export const ENV_ALIASES = {
+  ASC_ISSUER_ID: ["APPLE_ISSUER_ID"],
+  ASC_KEY_ID: ["APPLE_KEY_ID"],
+  ASC_PRIVATE_KEY: ["APPLE_PRIVATE_KEY"],
+  ASC_ALLOWED_APP_IDS: ["APPLE_ALLOWED_APP_IDS"],
+} as const;
+
+/** Returns an Env where ASC_* falls back to the APPLE_* alias when empty. Does not mutate the input. */
+export function normalizeEnv<T extends object>(raw: T): T & Env {
+  const env = { ...(raw as Record<string, unknown>) };
+  for (const [name, aliases] of Object.entries(ENV_ALIASES)) {
+    const current = env[name];
+    if (typeof current === "string" && current.trim() !== "") continue;
+    for (const alias of aliases) {
+      const v = env[alias];
+      if (typeof v === "string" && v.trim() !== "") {
+        env[name] = v;
+        break;
+      }
+    }
+  }
+  return env as T & Env;
+}
+
 export const REQUIRED_SECRETS = [
   "ASC_ISSUER_ID",
   "ASC_KEY_ID",
