@@ -31,7 +31,8 @@ Personal App Management MCP Server — Cloudflare Workers 上で動く、**App S
 | パス | 認証 | 用途 |
 | --- | --- | --- |
 | `GET /health` | 不要 | 稼働確認（設定値や秘密情報は返しません） |
-| `/mcp` | `Authorization: Bearer <MCP_BEARER_TOKEN>` | MCP（Streamable HTTP） |
+| `/mcp` | `MCP_BEARER_TOKEN` または OAuth アクセストークン | MCP（Streamable HTTP） |
+| `/.well-known/oauth-*`, `/register`, `/authorize`, `/token` | — | Claude カスタムコネクタ用 OAuth |
 
 トークン未設定時は `/mcp` を 503 で拒否します（フェイルクローズ）。
 
@@ -116,11 +117,21 @@ curl -sS $URL/mcp \
 
 MCP Inspector でも確認できます: `npx @modelcontextprotocol/inspector` → Transport「Streamable HTTP」、URL に `/mcp`、ヘッダーに `Authorization: Bearer ...`。
 
-## MCP クライアントへの接続
+## Claude（ブラウザ版・アプリ）に接続する
 
-カスタムヘッダーを付けられるクライアントでは、URL `https://.../mcp` と `Authorization: Bearer <MCP_BEARER_TOKEN>` を設定します。
+Claude のカスタムコネクタは OAuth で接続します。このサーバーは保存領域不要の OAuth を内蔵しており、承認画面で `MCP_BEARER_TOKEN` を入力して許可します（新しい Secret や KV は不要）。
 
-例（ヘッダー指定に対応したクライアント設定 / `mcp-remote` 経由）:
+1. claude.ai › 設定 › コネクタ › **カスタムコネクタを追加**
+2. 名前: `AppHub`、URL: `https://apphub-mcp.<your-subdomain>.workers.dev/mcp`（OAuth Client ID / Secret は空欄）
+3. 「接続」→ 承認ページで `MCP_BEARER_TOKEN` を入力 →「許可する」
+4. 新しいチャットで、ツールメニューから AppHub を有効にする
+
+- アクセストークンは 1 時間、リフレッシュトークンは 30 日有効です。
+- `MCP_BEARER_TOKEN` を変更すると、発行済みの OAuth トークンはすべて無効になります（再接続が必要）。
+
+## その他の MCP クライアント
+
+ヘッダーを指定できるクライアントでは、`Authorization: Bearer <MCP_BEARER_TOKEN>` をそのまま使えます。
 
 ```json
 {
@@ -134,8 +145,6 @@ MCP Inspector でも確認できます: `npx @modelcontextprotocol/inspector` �
   }
 }
 ```
-
-> 注: claude.ai の「カスタムコネクタ」のように OAuth 前提でヘッダーを設定できないクライアントでは、このままでは接続できません。その場合は今後 `@cloudflare/workers-oauth-provider` による OAuth 対応を追加する想定です。
 
 ## ローカル開発
 
@@ -164,12 +173,12 @@ src/
   asc-client.ts  読み取り専用 App Store Connect API クライアント
   jwt.ts         ES256 JWT 生成とキャッシュ
   auth.ts        Bearer Token 検証
+  oauth.ts       Claude カスタムコネクタ用 OAuth（ステートレス）
   env.ts         環境変数の型
 test/            node:test によるユニットテスト
 ```
 
 ## 今後の拡張候補
 
-- OAuth 対応（claude.ai カスタムコネクタ等向け）
 - カスタマーレビュー、売上・分析レポート、アプリ内課金（非サブスク）
 - 書き込み系操作（メタデータ更新、TestFlight 配布など）は確認フロー付きで別途検討

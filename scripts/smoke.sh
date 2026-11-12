@@ -16,6 +16,9 @@ trap 'kill $PID 2>/dev/null || true; rm -f .dev.vars' EXIT
 for _ in $(seq 1 60); do curl -fsS "http://127.0.0.1:$PORT/health" >/dev/null 2>&1 && break; sleep 1; done
 curl -fsS "http://127.0.0.1:$PORT/health"; echo
 
+curl -fsS "http://127.0.0.1:$PORT/.well-known/oauth-protected-resource/mcp" | grep -q authorization_servers || { echo "OAuth protected resource metadata missing"; exit 1; }
+curl -fsS "http://127.0.0.1:$PORT/.well-known/oauth-authorization-server" | grep -q registration_endpoint || { echo "OAuth AS metadata missing"; exit 1; }
+curl -sS -D - -o /dev/null -X POST "http://127.0.0.1:$PORT/mcp" | grep -qi 'resource_metadata=' || { echo "401 lacks resource_metadata"; exit 1; }
 code=$(curl -s -o /dev/null -w '%{http_code}' -X POST "http://127.0.0.1:$PORT/mcp")
 [ "$code" = "401" ] || { echo "expected 401 without token, got $code"; cat /tmp/wrangler-dev.log; exit 1; }
 
