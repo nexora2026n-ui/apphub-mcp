@@ -1,13 +1,14 @@
 import assert from "node:assert/strict";
+import { webcrypto } from "node:crypto";
 import { test } from "node:test";
 import { AscTokenProvider, base64UrlEncode, pemToDer, signAscJwt, importPrivateKey } from "../src/jwt";
 
 async function makeKeyPair() {
-  const pair = (await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, [
+  const pair = (await webcrypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, [
     "sign",
     "verify",
-  ])) as CryptoKeyPair;
-  const pkcs8 = new Uint8Array(await crypto.subtle.exportKey("pkcs8", pair.privateKey));
+  ])) as webcrypto.CryptoKeyPair;
+  const pkcs8 = new Uint8Array(await webcrypto.subtle.exportKey("pkcs8", pair.privateKey));
   const b64 = btoa(String.fromCharCode(...pkcs8)).replace(/(.{64})/g, "$1\n");
   const pem = `-----BEGIN PRIVATE KEY-----\n${b64}\n-----END PRIVATE KEY-----\n`;
   return { pem, publicKey: pair.publicKey };
@@ -35,7 +36,7 @@ test("signs a verifiable ES256 JWT with Apple's required claims", async () => {
   assert.ok(payload.exp - payload.iat <= 20 * 60);
   const sig = b64urlDecode(s!);
   assert.equal(sig.length, 64, "JWS ES256 signature must be raw 64-byte r||s");
-  const ok = await crypto.subtle.verify(
+  const ok = await webcrypto.subtle.verify(
     { name: "ECDSA", hash: "SHA-256" },
     publicKey,
     sig,
