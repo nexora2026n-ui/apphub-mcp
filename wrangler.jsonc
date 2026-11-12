@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "apphub-mcp",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  "vars": {
+    // Optional, non-secret: comma-separated App Store Connect app IDs this server may access.
+    // Leave empty to allow every app the API key can see.
+    "ASC_ALLOWED_APP_IDS": ""
+  }
+  // Secrets (set with `wrangler secret put`, never committed):
+  //   ASC_ISSUER_ID, ASC_KEY_ID, ASC_PRIVATE_KEY, MCP_BEARER_TOKEN
+}
