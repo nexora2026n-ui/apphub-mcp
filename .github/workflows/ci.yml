@@ -17,8 +17,6 @@ jobs:
         with:
           node-version: 22
       # No lockfile is committed yet; run `npm install` locally and commit package-lock.json, then switch to `npm ci`.
-      - name: Latest versions (info)
-        run: npm view agents peerDependencies peerDependenciesMeta; for p in agents @modelcontextprotocol/server @modelcontextprotocol/sdk zod wrangler typescript tsx; do echo "$p $(npm view $p version)"; done
       - run: npm install
       - run: npm ls --depth=0
       - run: npm run typecheck

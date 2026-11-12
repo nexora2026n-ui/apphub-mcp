@@ -3,7 +3,7 @@
 Personal App Management MCP Server — Cloudflare Workers 上で動く、**App Store Connect 専用・読み取り専用**の Remote MCP サーバーです。
 
 - Cloudflare Workers / TypeScript
-- Cloudflare 公式 [`agents`](https://www.npmjs.com/package/agents) SDK の `createMcpHandler` ＋ 公式 [`@modelcontextprotocol/sdk`](https://www.npmjs.com/package/@modelcontextprotocol/sdk)
+- Cloudflare 公式 [`agents`](https://www.npmjs.com/package/agents) SDK（0.33）の `createMcpHandler` ＋ 公式 MCP SDK（`agents` が要求する版に固定: `@modelcontextprotocol/sdk` 1.32.2 / `@modelcontextprotocol/server` 2.4.0）
 - **Streamable HTTP**（ステートレス）、エンドポイント `/mcp`
 - App Store Connect API へ **ES256 JWT** で接続（WebCrypto で署名、最長 20 分・自動更新）
 - Apple の API キーは **Cloudflare Secrets** から取得（GitHub には保存しない）
