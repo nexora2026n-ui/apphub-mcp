@@ -83,6 +83,22 @@ npm run deploy
 
 `https://apphub-mcp.<your-subdomain>.workers.dev/mcp` が MCP エンドポイントになります。
 
+### GitHub 連携（Workers Builds）でデプロイする場合
+
+Cloudflare ダッシュボード › Workers & Pages › 作成 › **Workers**（Pages ではない）› GitHub リポジトリをインポート。
+
+| 項目 | 値 |
+| --- | --- |
+| プロジェクト名 | `apphub-mcp`（`wrangler.jsonc` の `name` と一致させる） |
+| 本番ブランチ | `main` |
+| ビルドコマンド | 空欄（依存関係は自動インストール） |
+| デプロイコマンド | `npx wrangler deploy` |
+| ルートディレクトリ | `/` |
+
+Secrets（`ASC_ISSUER_ID` / `ASC_KEY_ID` / `ASC_PRIVATE_KEY` / `MCP_BEARER_TOKEN`）は Worker の **設定 › 変数とシークレット** で「シークレット」として追加します（ビルド用変数ではなく Worker のランタイム変数）。
+
+> `Could not detect a directory containing static files` と出る場合は、デプロイ対象ブランチに `wrangler.jsonc` が無いか、Pages プロジェクトとして作成されています。
+
 ## 動作確認
 
 ```bash
