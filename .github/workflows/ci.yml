@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      # No lockfile is committed yet; run `npm install` locally and commit package-lock.json, then switch to `npm ci`.
+      - run: npm install
+      - run: npm ls --depth=0
+      - run: npm run typecheck
+      - run: npm test
+      - name: Bundle (wrangler dry run, no deploy, no secrets needed)
+        run: npm run build
+      - name: Smoke test /mcp with wrangler dev
+        run: npm run smoke

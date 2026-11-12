@@ -1,0 +1,6 @@
+# Copy to .dev.vars for `npm run dev` (.dev.vars is git-ignored). Never commit real values.
+ASC_ISSUER_ID=00000000-0000-0000-0000-000000000000
+ASC_KEY_ID=ABCDE12345
+# Contents of AuthKey_XXXX.p8 on one line, with newlines written as \n
+ASC_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
+MCP_BEARER_TOKEN=change-me-to-a-long-random-string
